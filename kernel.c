@@ -25,11 +25,23 @@ void putchar(char ch) {
     sbi_call(ch, 0, 0, 0, 0, 0, 0, 1 /* Console Putchar */);
 }
 
+long getchar(void) {
+    struct sbiret ret = sbi_call(0, 0, 0, 0, 0, 0, 0, 2);
+    return ret.error;
+}
+
 void kernel_main(void) {
-    const char *s = "\n\nHello World!\n";
-    for (int i = 0; s[i] != '\0'; i++) {
-        putchar(s[i]);
+    
+    char s;
+    while (1) {
+      long ch = getchar();
+      if (ch >= 0) {
+        s = (char)ch;
+        break;
+      }
     }
+  
+    putchar(s);
 
     for (;;) {
         __asm__ __volatile__("wfi");
