@@ -30,17 +30,17 @@ long getchar(void) {
     return ret.error;
 }
 
-void kernel_main(void) {
-    
-    char s;
-    while (1) {
-      long ch = getchar();
-      if (ch >= 0) {
-        s = (char)ch;
-        break;
-      }
+char readchar(void) {
+  while (1) {
+    long ch = getchar();
+    if (ch >= 0) {
+      return (char)ch;
     }
-  
+  }
+}
+
+void kernel_main(void) {
+    char s = readchar(); 
     putchar(s);
 
     for (;;) {
