@@ -73,6 +73,31 @@ void hartgetstatus(void) {
   printf("\n Hart get status: %d\n", (int)s.error); // handle error 
 }
 
+void hart_get_status(){
+    printf("Input hart status: ");
+    int hartid = getdigit();
+    struct sbis s = sbi_call(hartid, 0, 0, 0, 0, 0, 2, 0x48534D);
+    if(s.error != 0){
+        printf("There is no hart\n");
+    } else{
+        if(s.value == 0){
+            printf("STARTED\n");
+        } else if(s.value == 1){
+            printf("STOPPED\n");
+        } else if(s.value == 2){
+            printf("START_PENDING\n");
+        } else if(s.value == 3){
+            printf("STOP_PENDING\n");
+        } else if(s.value == 4){
+            printf("SUSPENDED\n");
+        } else if(s.value == 5){
+            printf("SUSPEND_PENDING\n");
+        } else {
+            printf("RESUME_PENDING\n");
+        }
+    }
+}
+
 void hartstop(void) {
   struct sbiret s = sbi_call(0, 0, 0, 0, 0, 0, 1, 0x48534D);
   printf("\n Hart stop status: %d\n", (int)s.value);
