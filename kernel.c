@@ -1,4 +1,5 @@
 #include "kernel.h"
+#include "common.h"
 
 extern char __bss[], __bss_end[], __stack_top[];
 
@@ -39,9 +40,78 @@ char readchar(void) {
   }
 }
 
+long readlong(void) {
+    long value = 0;
+    int sign = 1;
+
+    while (1) {
+        long ch = getchar();
+
+        if (ch == '-') {
+            sign = -1; 
+            continue;
+            putchar((char)ch);
+        }
+
+        if (ch >= '0' && ch <= '9') {
+            value = value * 10 + (ch - '0');
+            putchar((char)ch);
+        } else if (ch == '\n' || ch == ' ' || ch == '\t') {
+            return value * sign;
+        }
+    }
+}
+
+void getsbi(void) {
+  struct sbiret s = sbi_call(0, 0, 0, 0, 0, 0, 0, 0x10);
+  printf("\nSBI version: %d\n", (int)s.value);
+}
+
+void hartgetstatus(void) {
+  long hartid = readlong();
+  struct sbiret s = sbi_call(hartid, 0, 0, 0, 0, 0, 2, 0x48534D);
+  printf("\n Hart get status: %d\n", (int)s.error); // handle error 
+}
+
+void hartstop(void) {
+  struct sbiret s = sbi_call(0, 0, 0, 0, 0, 0, 1, 0x48534D);
+  printf("\n Hart stop status: %d\n", (int)s.value);
+}
+
+void shutdown(void) {
+  struct sbiret s = sbi_call(0, 0, 0, 0, 0, 0, 0, 0x08);
+  printf("\nshutdown\n");
+}
+  
 void kernel_main(void) {
-    char s = readchar(); 
-    putchar(s);
+    for (;;) {
+      printf("\n \
+              menu\n \
+              1. get sbi -v \n \
+              2. hart get status \n \
+              3. hart stop \n \
+              4. shutdown \n \
+      "); 
+      long l = readlong();
+      
+      switch (l) {
+      case 1: 
+        getsbi();
+        break;
+      case 2:
+        hartgetstatus();
+        break;
+      case 3:
+        hartstop();
+        break;
+      case 4:
+        shutdown();
+        break;
+      default:
+        continue;
+      }
+    } 
+
 
     for (;;) {
         __asm__ __volatile__("wfi");
