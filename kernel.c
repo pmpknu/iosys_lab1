@@ -68,14 +68,8 @@ void getsbi(void) {
 }
 
 void hartgetstatus(void) {
-  long hartid = readlong();
-  struct sbiret s = sbi_call(hartid, 0, 0, 0, 0, 0, 2, 0x48534D);
-  printf("\n Hart get status: %d\n", (int)s.error); // handle error 
-}
-
-void hart_get_status(){
     printf("Input hart status: ");
-    int hartid = getdigit();
+    long hartid = readlong();
     struct sbis s = sbi_call(hartid, 0, 0, 0, 0, 0, 2, 0x48534D);
     if(s.error != 0){
         printf("There is no hart\n");
